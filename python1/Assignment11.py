@@ -1,14 +1,15 @@
+#Wij doen MEE
+#Rik van Heumen and Dillen Bruil
+#23 1 2017
+
 #Import packages
 from osgeo import ogr,osr
 import os
-
-#Create data folder
-if not os.path.exists("data"):
-    os.makedirs("data")
-    print "New data directory is created"
-
+import folium
+      
+## GeoJSON file
 #Create driver
-driverName = "ESRI Shapefile"
+driverName = "GeoJSON"
 drv = ogr.GetDriverByName(driverName)
 
 if drv is None:
@@ -17,7 +18,7 @@ else:
     print "%s driver IS available.\n" % driverName
 
 #Name shape file and layer
-fn = "data/houses.shp"
+fn = "houses.geojson"
 layername = "house_loc"
 
 #Create shapefile
@@ -37,18 +38,6 @@ Rik = ogr.Geometry(ogr.wkbPoint)
 Dil.SetPoint(0,6.163800,52.094116)
 Rik.SetPoint(0,5.121797,51.545696)
 
-#Export to KML
-print "KML file export"
-DilKML = Dil.ExportToKML()
-print DilKML
-RikKML = Rik.ExportToKML()
-print RikKML
-
-#Buffering
-bufferDil = Dil.Buffer(1,1)
-bufferRik = Rik.Buffer(1,1)
-print bufferDil
-
 #Get features
 layerDefinition = layer.GetLayerDefn()
 featureDil = ogr.Feature(layerDefinition)
@@ -61,16 +50,20 @@ featureRik.SetGeometry(Rik)
 #Store features in a layer
 layer.CreateFeature(featureDil)
 layer.CreateFeature(featureRik)
-print "The new extent"
-print layer.GetExtent()
 
+#Update
 ds.Destroy()
 
-#Load to Qgis
-qgis.utils.iface.addVectorLayer(fn, layername, "ogr") 
-aLayer = qgis.utils.iface.activeLayer()
-print aLayer.name()
+#Create html file to see the locations online
+pointsGeo=os.path.join("houses.geojson")
+map_points = folium.Map(location=[52,5.7],tiles='Mapbox Bright', zoom_start=6)
+map_points.choropleth(geo_path=pointsGeo)
+map_points.save('houses.html')
 
+#Create KML file
+bashCommand = "ogr2ogr -f kml -t_srs crs:84 houses.kml houses.geojson"
+os.system(bashCommand)
+print "The job has been done :)"
 
 
 
