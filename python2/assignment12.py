@@ -31,7 +31,8 @@ tar.close()
 
 
 # Load the necessary files
-os.chdir('/home/ubuntu/userdata/wk3_repository/python2')
+#Change the below line to the correct director, but please just run the notebook
+#os.chdir('/home/ubuntu/userdata/wk3_repository/python2')
 band3file = "LC81980242014260LGN00_sr_band3.tif"
 band5file = "LC81980242014260LGN00_sr_band5.tif"
 
